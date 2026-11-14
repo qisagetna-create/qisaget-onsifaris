@@ -1,7 +1,10 @@
 (function(){
 'use strict';
-/* DEMO=true: real e-poçt göndərilmir, istənilən 6 rəqəm qəbul olunur. Supabase qoşulanda false edin. */
-var DEMO=true;
+/* Supabase: public/js/config.js içində URL və anon key yazılıbsa real rejim, yoxsa demo rejim (kod göndərilmir, istənilən 6 rəqəm qəbul olunur). */
+var CFG=window.QISAGET_CONFIG||{};
+var SB=null;
+try{if(CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY&&window.supabase)SB=window.supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY)}catch(e){SB=null}
+var DEMO=!SB;
 var QLOGO='<svg class="qlogo" aria-hidden="true"><use href="#qlogo"/></svg>';
 var SMILE='<svg class="smile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><circle cx="8.8" cy="9.6" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.2" cy="9.6" r="1.1" fill="currentColor" stroke="none"/><path d="M7.5 14c1 2.2 2.6 3.2 4.5 3.2s3.5-1 4.5-3.2"/></svg>';
 var root=document.getElementById('reg'),app=document.getElementById('reg-app'),toastEl=document.getElementById('reg-toast');
@@ -163,10 +166,10 @@ function save(){
  var pn=$('pn'),pb=$('pb');if(pn)S.name=pn.value.trim();if(pb)S.bio=pb.value.trim();
 }
 function focusFirst(){var f=app.querySelector('#em,#un,.codes input');if(f)try{f.focus({preventScroll:true})}catch(e){}}
-function go(s){save();S.h.push(S.scr);S.scr=s;draw();root.scrollTop=0;if(s==='user'||s==='code')focusFirst()}
+function go(s){save();S.h.push(S.scr);S.scr=s;if(s==='admin')savePreorder();draw();root.scrollTop=0;if(s==='user'||s==='code')focusFirst()}
 function bk(){save();S.scr=S.h.pop()||'join';if(S.scr==='admin')S.edit=false;draw();root.scrollTop=0}
 function edit(s){save();S.edit=true;S.h.push('admin');S.scr=s;draw();root.scrollTop=0}
-function done(){save();S.edit=false;S.h=['theme'];S.scr='admin';draw();root.scrollTop=0}
+function done(){save();savePreorder();S.edit=false;S.h=['theme'];S.scr='admin';draw();root.scrollTop=0}
 function toast(m){toastEl.textContent=m;toastEl.hidden=false;clearTimeout(tmr);tmr=setTimeout(function(){toastEl.hidden=true},2600)}
 function copy(t,cb){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){cb(true)},function(){cb(false)});return}}catch(e){}cb(false)}
 
@@ -181,21 +184,40 @@ function login(){toast('Giriş səhifəsi tezliklə aktiv olacaq.')}
 function un(){var el=$('un');if(!el)return;var v=clean(el.value);if(v!==el.value)el.value=v;S.user=v;$('nx').className='pill'+(validUser(v)?' go':'');$('e').textContent=''}
 function u1(){
  if(!validUser(S.user)){$('e').textContent='İstifadəçi adı ən azı 3 simvol olmalıdır.';return}
- /* Supabase: ad boşdursa yoxla — await supabase.from('profiles').select().eq('username',S.user) */
- go('code');
+ if(!SB){go('code');return}
+ var b=$('nx');b.disabled=true;
+ SB.rpc('username_taken',{u:S.user}).then(function(r){
+  if(r.error)throw r.error;
+  if(r.data){var b1=$('nx');if(b1)b1.disabled=false;$('e').textContent='Bu ad artıq götürülüb. Başqa ad seç.';return}
+  return SB.auth.signInWithOtp({email:S.email.toLowerCase(),options:{shouldCreateUser:true}}).then(function(r2){if(r2.error)throw r2.error;go('code')});
+ }).catch(function(err){var b2=$('nx');if(b2)b2.disabled=false;var e=$('e');if(e)e.textContent='Xəta oldu: '+((err&&err.message)||'bir az sonra yenidən yoxla')});
 }
 function codeInputs(){return root.querySelectorAll('.codes input')}
 function codeSync(){var c=[].map.call(codeInputs(),function(x){return x.value}).join('');S.code=c;var nx=$('nx');nx.disabled=c.length<6;nx.className='pill'+(c.length===6?' go':'')}
 function cd(el,i){el.value=el.value.replace(/\D/g,'').slice(0,1);var a=codeInputs();if(el.value&&a[i+1])a[i+1].focus();codeSync()}
 function cb(e,i){var a=codeInputs();if(e.key==='Backspace'&&!e.target.value&&i>0){a[i-1].focus()}else if(e.key==='Enter'){e.preventDefault();var b=$('nx');if(b&&!b.disabled)b.click()}}
 function cp(e){var d=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);if(!d)return;e.preventDefault();var a=codeInputs();for(var i=0;i<6;i++)a[i].value=d.charAt(i);a[Math.min(d.length,5)].focus();codeSync()}
-function resend(){toast('Kod yenidən göndərildi.')}
+function resend(){
+ if(!SB){toast('Kod yenidən göndərildi.');return}
+ SB.auth.signInWithOtp({email:S.email.toLowerCase(),options:{shouldCreateUser:true}}).then(function(r){toast(r.error?'Kod göndərilmədi, bir az sonra yenidən yoxla.':'Kod yenidən göndərildi.')});
+}
 function c1(){
  if(S.code.length<6)return;
- /* Supabase: await supabase.auth.verifyOtp({email:S.email,token:S.code,type:'email'}) */
- S.h=[];S.scr='plan';draw();root.scrollTop=0;
+ if(!SB){S.h=[];S.scr='plan';draw();root.scrollTop=0;return}
+ var b=$('nx');b.disabled=true;
+ SB.auth.verifyOtp({email:S.email.toLowerCase(),token:S.code,type:'email'}).then(function(r){
+  if(r.error||!r.data||!r.data.user)throw r.error||new Error('no user');
+  S.uid=r.data.user.id;S.h=[];S.scr='plan';draw();root.scrollTop=0;
+ }).catch(function(){var b2=$('nx');if(b2)b2.disabled=false;toast('Kod yanlışdır və ya vaxtı bitib.')});
 }
-function pick(name){S.plan=name;go('purpose')}
+function savePreorder(){
+ if(!SB||!S.uid)return;
+ var row={user_id:S.uid,email:S.email.toLowerCase(),username:S.user,plan:S.plan,purpose:S.purpose||null,platforms:S.plats,
+  links:links().filter(function(l){return l.url}).map(function(l){return{title:l.t,url:l.url}}),
+  display_name:S.name||null,bio:S.bio||null,theme:S.th>-1?S.th:null};
+ SB.from('preorders').upsert(row,{onConflict:'user_id'}).then(function(r){if(r.error)throw r.error}).catch(function(){toast('Məlumat saxlanmadı. İnternetini yoxla və yenidən cəhd et.')});
+}
+function pick(name){S.plan=name;savePreorder();go('purpose')}
 function sp(el,v){S.purpose=v;[].forEach.call(el.parentNode.querySelectorAll('.opt'),function(x){x.setAttribute('aria-pressed',String(x===el))});$('nx').disabled=false}
 function tp(el,n){var i=S.plats.indexOf(n);if(i<0)S.plats.push(n);else S.plats.splice(i,1);el.setAttribute('aria-pressed',String(i<0));$('nx').disabled=!S.plats.length}
 function addx(){save();S.xn++;draw()}

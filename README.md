@@ -30,11 +30,22 @@ server.js           Yerli server
 
 Landing-də link adı yazılır, sonra: e-poçt, istifadəçi adı, kod, plan, məqsəd, platformalar, linklər, profil, tema, admin paneli.
 
+## Supabase qoşmaq (ön sifariş və e-poçt kodu)
+
+1. supabase.com-da layihə yarat.
+2. SQL Editor-da `supabase/schema.sql` faylının içindəkini işə sal. Bu, `preorders` cədvəlini və qaydaları yaradır.
+3. Authentication, sonra Email Templates bölməsində "Confirm signup" və "Magic Link" şablonlarına `{{ .Token }}` yaz. E-poçtla gedən 6 rəqəmli kod budur. Məsələn: `Qisaget təsdiq kodun: {{ .Token }}`
+4. Project Settings, sonra API bölməsindən "Project URL" və "anon public" açarını `public/js/config.js` faylına yaz. `service_role` açarını heç yerə yazma.
+5. `npm run dev` ilə yoxla. Sifarişləri Supabase panelində Table Editor, sonra `preorders` bölməsində görürsən.
+
+Supabase-in daxili e-poçt göndərməsi saatda cəmi bir neçə mesajla məhdudlaşır. Çoxlu istifadəçi üçün Project Settings, sonra Authentication bölməsində öz SMTP xidmətini (məsələn Resend) qoş.
+
+`config.js` boş qalarsa, sayt demo rejimdə işləyir.
+
 ## Hələ qoşulmayıb
 
-- Məlumatlar serverə getmir, yalnız brauzerdə qalır.
-- `js/signup.js` başında `DEMO = true` var: real e-poçt göndərilmir, istənilən 6 rəqəm qəbul olunur. Supabase qoşanda `false` edin.
-- Supabase üçün yerlər kodda şərh kimi qeyd olunub: `u1()` (istifadəçi adı yoxlanışı) və `c1()` (kodun təsdiqi).
+- Profil şəkli hələ Supabase-ə yüklənmir, yalnız brauzerdə qalır.
+- Açıq profil səhifəsi (`qisaget.az/ad`) hələ yoxdur.
 - Google ilə giriş, "Daxil ol", Pro planlar və footer sosial linkləri (`#`) hələ aktiv deyil.
 
 ## GitHub-a yükləmək
