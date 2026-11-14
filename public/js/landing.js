@@ -1,0 +1,3 @@
+(function(){var n=document.querySelector('nav');function f(){var b=innerWidth<=900?65:94;n.style.top=Math.max(14,b-scrollY)+'px'}addEventListener('scroll',f,{passive:true});addEventListener('resize',f);f()})();
+document.querySelectorAll('.question').forEach(b=>b.addEventListener('click',()=>b.parentElement.classList.toggle('open')));
+document.querySelector('.menu').addEventListener('click',()=>{let l=document.querySelector('.links');l.style.display=l.style.display==='flex'?'none':'flex';l.style.position='absolute';l.style.top='72px';l.style.left='0';l.style.right='0';l.style.padding='22px';l.style.background='white';l.style.borderRadius='20px';l.style.flexDirection='column'});
