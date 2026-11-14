@@ -20,6 +20,9 @@ create unique index if not exists preorders_username_key on public.preorders (lo
 
 alter table public.preorders enable row level security;
 
+-- Yeni cədvəllər avtomatik açılmadığı üçün giriş etmiş istifadəçilərə icazəni özümüz veririk.
+grant select, insert, update on public.preorders to authenticated;
+
 -- Hər istifadəçi yalnız öz sətrini görə, yarada və dəyişə bilər.
 create policy "oz melumatini oxu" on public.preorders
   for select to authenticated using (auth.uid() = user_id);
