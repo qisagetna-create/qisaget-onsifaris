@@ -284,7 +284,7 @@ document.addEventListener("keydown",e=>{if(e.key!=="Enter")return;if(e.target.id
 /* ---------- giriş (e-poçt kodu) və başlanğıc ---------- */
 let GE="";
 const gm=t=>{const e=$("#gm");if(e)e.textContent=t};
-const HOME='<a class="lnkx" href="index.html">Qeydiyyatdan keç</a>';
+const HOME='<a class="lnkx" href="/">Pulsuz qeydiyyatdan keç</a>';
 function gate(msg){$("#app").innerHTML=`<div class="gw"><h2>QısaGet${QL}</h2><p class="mu">E-poçtunu yaz, sənə 6 rəqəmli kod göndərək.</p><input id="ge" type="email" placeholder="ad@gmail.com" value="${esc(GE)}" autocapitalize="off"><button class="pill blk full" data-a="gsend">Kod göndər</button><p class="mu" id="gm">${esc(msg||"")}</p>${HOME}</div>`}
 function gcode(){$("#app").innerHTML=`<div class="gw"><h2>Kodu yaz</h2><p class="mu">${esc(GE)} ünvanına göndərilən 6 rəqəmli kodu yaz.</p><input id="gc" inputmode="numeric" maxlength="6" placeholder="000000" style="text-align:center;font-size:24px;letter-spacing:6px"><button class="pill blk full" data-a="gver">Təsdiqlə</button><button class="pill full" data-a="gback">Geri</button><p class="mu" id="gm"></p></div>`}
 function nogo(){$("#app").innerHTML=`<div class="gw"><h2>Qeydiyyat tapılmadı</h2><p class="mu">Bu hesab üçün ön sifariş qeydiyyatı yoxdur. Əvvəlcə qeydiyyatdan keç.</p>${HOME}<br><button class="pill full" data-a="out">Çıxış</button></div>`}

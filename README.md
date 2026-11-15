@@ -63,6 +63,8 @@ Supabase-də `supabase/schema.sql` faylının bütün hissələrini işə salmaq
 
 ## Vercel-də yayımlamaq
 
+Landing və admin panel eyni domendə qalır: `sayt.vercel.app` və `sayt.vercel.app/admin`. Domen alınanda bu `qisaget.az` və `qisaget.az/admin` olur. Menyudakı "Daxil ol" düyməsi `/admin`-ə aparır. Ayrı domenlərdə brauzer girişi ötürmədiyi üçün qeydiyyatdan sonra ikinci kod tələb olunardı, ona görə bir domen saxlanılır.
+
 GitHub reposunu Vercel-ə bağla. `vercel.json` faylı `public` qovluğunu yayımlayır və `/admin` ünvanını `admin.html` ilə eyniləşdirir. Supabase-də Authentication, URL Configuration bölməsinə Vercel və qisaget.az ünvanlarını yaz.
 
 ## GitHub-a yükləmək

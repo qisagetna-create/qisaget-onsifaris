@@ -152,7 +152,7 @@ function finish(){
  save();
  if(!SB){toast('Demo rejimi: admin panel üçün Supabase qoşulmalıdır.');return}
  var b=$('nx');if(b)b.disabled=true;
- savePreorder().then(function(ok){if(ok)location.href='admin.html';else if(b)b.disabled=false});
+ savePreorder().then(function(ok){if(ok)location.href='/admin';else if(b)b.disabled=false});
 }
 function bk(){save();S.scr=S.h.pop()||'join';draw();root.scrollTop=0}
 function toast(m){toastEl.textContent=m;toastEl.hidden=false;clearTimeout(tmr);tmr=setTimeout(function(){toastEl.hidden=true},2600)}
@@ -166,7 +166,7 @@ function closeReg(){root.classList.remove('open');document.body.style.overflow='
 function chk(){var el=$('em');if(!el)return;var v=el.value.trim();S.email=v;$('nx').disabled=!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v)}
 function enter(e){if(e.key==='Enter'){e.preventDefault();var b=$('nx');if(b&&!b.disabled)b.click()}}
 function j1(g){if(g){toast('Google ilə giriş tezliklə aktiv olacaq.');return}go('user')}
-function login(){location.href='admin.html'}
+function login(){location.href='/admin'}
 function un(){var el=$('un');if(!el)return;var v=clean(el.value);if(v!==el.value)el.value=v;S.user=v;$('nx').className='pill'+(validUser(v)?' go':'');$('e').textContent=''}
 function u1(){
  if(!validUser(S.user)){$('e').textContent='İstifadəçi adı ən azı 3 simvol olmalıdır.';return}
@@ -201,7 +201,7 @@ function c1(){
 function afterVerify(uid){
  return SB.from('preorders').select('*').eq('user_id',uid).maybeSingle().then(function(q){
   if(q.error)throw q.error;
-  if(q.data){if(q.data.theme!=null){location.href='admin.html';return}openState(restore(q.data));return}
+  if(q.data){if(q.data.theme!=null){location.href='/admin';return}openState(restore(q.data));return}
   S.uid=uid;
   if(!validUser(S.user)){S.h=[];S.scr='user';draw();root.scrollTop=0;return}
   return SB.from('preorders').upsert(rowData(),{onConflict:'user_id'}).then(function(w){
@@ -278,7 +278,7 @@ if(SB){SB.auth.getSession().then(function(r){
  var ss=r.data&&r.data.session;if(!ss||root.classList.contains('open'))return;
  return SB.from('preorders').select('*').eq('user_id',ss.user.id).maybeSingle().then(function(q){
   if(!q.data||root.classList.contains('open'))return;
-  if(q.data.theme!=null)location.href='admin.html';else openState(restore(q.data));
+  if(q.data.theme!=null)location.href='/admin';else openState(restore(q.data));
  });
 }).catch(function(){})}
 
