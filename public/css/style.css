@@ -86,6 +86,9 @@ background:var(--pg,var(--bg));color:var(--ink);font:400 16px/1.45 "Instrument S
 #reg .pt[aria-pressed=true]{border:2px solid var(--ink);background:var(--soft)}
 #reg .ic{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;color:#fff;font:800 20px "Bricolage Grotesque",sans-serif;flex:none}
 #reg .ic.r{border-radius:50%;width:30px;height:30px;font-size:14px}
+#reg .ic svg{width:54%;height:54%;fill:currentColor;display:block}
+#reg .ic.r svg{width:56%;height:56%}
+#reg .ic svg.sn path{stroke:#000;stroke-width:.9;stroke-linejoin:round;paint-order:stroke}
 #reg .fld{position:relative;margin-bottom:8px}
 #reg .fld .in{height:52px;padding-right:56px;border-radius:16px}
 #reg .fld .ic{position:absolute;right:11px;top:11px}
@@ -127,6 +130,7 @@ background:var(--pg,var(--bg));color:var(--ink);font:400 16px/1.45 "Instrument S
 #reg .adm{max-width:640px;margin:0 auto;width:100%;padding:14px 18px 130px;min-width:0}
 #reg .ah{display:flex;gap:10px;align-items:center}
 #reg .ah .c{width:52px;height:46px;border-radius:23px;border:0;background:var(--soft);font-weight:800;padding:0}
+#reg .ah .ob{flex:none;height:46px;padding:0 20px;border-radius:23px;background:var(--pur);color:#fff;display:inline-flex;align-items:center;font-weight:700;font-size:14.5px;white-space:nowrap}
 #reg .ah .sh{flex:1;height:46px;border-radius:23px;border:0;background:var(--soft);font-weight:600}
 #reg .pro{display:flex;gap:18px;align-items:center;margin:26px 0 18px}
 #reg .pro .av{width:86px;height:86px;flex:none}

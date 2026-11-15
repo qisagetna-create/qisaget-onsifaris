@@ -42,11 +42,17 @@ Supabase-in daxili e-poçt göndərməsi saatda cəmi bir neçə mesajla məhdud
 
 `config.js` boş qalarsa, sayt demo rejimdə işləyir.
 
+### Məlumat necə saxlanır
+
+- Kod təsdiqlənən kimi e-poçt və istifadəçi adı `preorders` cədvəlinə yazılır. Sonra plan, məqsəd, platformalar, linklər, ad, bio və tema hər addımda yenilənir.
+- Eyni cihazda sayta yenidən girəndə sessiya yadda qalır və istifadəçi birbaşa admin panelə düşür. Başqa cihazda "Daxil ol" düyməsi ilə e-poçta gələn kodla daxil olur.
+- Admin paneldə "Ön sifariş" nişanı göstərilir.
+
 ## Hələ qoşulmayıb
 
-- Profil şəkli hələ Supabase-ə yüklənmir, yalnız brauzerdə qalır.
+- Profil şəkli hələ Supabase-ə yüklənmir, yalnız həmin cihazın brauzerində qalır.
 - Açıq profil səhifəsi (`qisaget.az/ad`) hələ yoxdur.
-- Google ilə giriş, "Daxil ol", Pro planlar və footer sosial linkləri (`#`) hələ aktiv deyil.
+- Google ilə giriş, Pro planlar və footer sosial linkləri (`#`) hələ aktiv deyil.
 
 ## GitHub-a yükləmək
 
