@@ -6,7 +6,6 @@ var SB=null;
 try{if(CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY&&window.supabase)SB=window.supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY)}catch(e){SB=null}
 var DEMO=!SB;
 var QLOGO='<svg class="qlogo" aria-hidden="true"><use href="#qlogo"/></svg>';
-var SMILE='<svg class="smile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><circle cx="8.8" cy="9.6" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.2" cy="9.6" r="1.1" fill="currentColor" stroke="none"/><path d="M7.5 14c1 2.2 2.6 3.2 4.5 3.2s3.5-1 4.5-3.2"/></svg>';
 var root=document.getElementById('reg'),app=document.getElementById('reg-app'),toastEl=document.getElementById('reg-toast');
 var S=null,lastScr='',tmr=0;
 function $(i){return document.getElementById(i)}
@@ -82,8 +81,6 @@ function ph(i){
 var SC={
 join:function(){return'<div class="scr"><div class="split"><div class="lf"><div class="fm">'+logo()+'<button class="back" onclick="QS.close()">‹ Ana səhifə</button><h1>QısaGet-ə qoşul</h1><p class="sub">Pulsuz qeydiyyatdan keç!</p><input class="in" id="em" type="email" aria-label="E-poçt" placeholder="E-poçt" autocomplete="email" autocapitalize="off" spellcheck="false" value="'+esc(S.email)+'" oninput="QS.chk()" onkeydown="QS.enter(event)"><div class="err" id="e"></div><button class="pill go" id="nx" disabled onclick="QS.j1()">Davam et</button><p class="fine"><b>Davam et</b> düyməsinə basaraq QısaGet-in <u>məxfilik bildirişini</u> və <u>şərtlərini</u> qəbul edir, yeniliklər və təkliflər almağa razılıq verirsən.</p><div class="or">VƏ YA</div><button class="pill" onclick="QS.j1(1)"><b style="color:#4285f4">G</b> Google ilə davam et</button><div class="hint">Artıq hesabın var? <button class="lnk" onclick="QS.login()">Daxil ol</button></div></div></div>'+art()+'</div></div>'},
 
-login:function(){return'<div class="scr"><div class="split"><div class="lf"><div class="fm">'+logo()+'<button class="back" onclick="QS.bk()">‹ Geri</button><h1>Daxil ol</h1><p class="sub">E-poçtunu yaz, sənə təsdiq kodu göndərək.</p><input class="in" id="em" type="email" aria-label="E-poçt" placeholder="E-poçt" autocomplete="email" autocapitalize="off" spellcheck="false" value="'+esc(S.email)+'" oninput="QS.chk()" onkeydown="QS.enter(event)"><div class="err" id="e"></div><button class="pill go" id="nx" disabled onclick="QS.l1()">Kod göndər</button><div class="hint">Hesabın yoxdur? <button class="lnk" onclick="QS.bk()">Qeydiyyatdan keç</button></div></div></div>'+art()+'</div></div>'},
-
 user:function(){return'<div class="scr"><div class="split"><div class="lf"><div class="fm">'+logo()+'<button class="back" onclick="QS.bk()">‹ Geri</button><h1>İstifadəçi adını seç</h1><p class="sub" style="font-size:14.5px">Asan tanınmaq üçün sosial şəbəkədəki adına yaxın ad seç.</p><div class="pre"><span>qisaget.az/</span><div style="flex:1;min-width:0"><label for="un">istifadəçi adı</label><input id="un" value="'+esc(S.user)+'" maxlength="24" autocomplete="off" autocapitalize="off" spellcheck="false" oninput="QS.un()" onkeydown="QS.enter(event)"></div></div><div class="err" id="e"></div><button class="pill" id="nx" onclick="QS.u1()">Davam et</button></div></div>'+art()+'</div></div>'},
 
 code:function(){
@@ -113,7 +110,7 @@ links:function(){
  var pf=PL.filter(function(p){return S.plats.indexOf(p[0])>-1}).map(function(p){var wa=p[0]==='WhatsApp',web=p[0]==='Veb sayt';return'<div class="fld" data-p="'+esc(p[0])+'"><input class="in" data-k="'+esc(p[0])+'" aria-label="'+esc(p[0])+'" value="'+esc(S.v[p[0]]||'')+'" placeholder="'+(wa?'Telefon nömrəsini yaz':web?'https://':'@  istifadəçi adı')+'" inputmode="'+(wa?'tel':web?'url':'text')+'" autocapitalize="off" spellcheck="false" onchange="QS.vf(this)">'+icon(p,1)+'<div class="ferr" role="alert"></div></div>'}).join('');
  var ex='';for(var i=0;i<S.xn;i++){var pn=S.exp[i]||'',pp=pn?plat(pn):null;ex+='<div class="fld" data-p="'+esc(pn)+'"><input class="in" data-x="'+i+'" aria-label="Digər link '+(i+1)+'" value="'+esc(S.ex[i]||'')+'" placeholder="'+(pp?esc(pp[0])+' linki':'https://')+'" inputmode="url" autocapitalize="off" spellcheck="false" onchange="QS.vf(this)"><button type="button" class="ic r" style="'+(pp?icStyle(pp):'background:#d4e81f;color:#111')+'" onclick="QS.pickIcon('+i+')" aria-label="Platforma seç">'+(pp?glyph(pp[0]):'∞')+'</button><div class="ferr" role="alert"></div></div>'}
  return'<div class="scr"><div class="col">'+topBar(1)+'<div class="body"><h1>Bağlantılarını əlavə et</h1><p class="sub">Məzmununu yeni QısaGet-ə əlavə etmək üçün aşağıdakı sahələri doldur.</p>'+(pf?'<div class="h3">Sosial profillərin və əlaqə məlumatların</div>'+pf:'')+'<div class="h3">Digər linklər</div><p class="hintx">Logoya basıb link üçün platforma seçə bilərsən.</p>'+ex+'<button class="plus" onclick="QS.addx()">+ Link əlavə et</button></div>'
- +(S.edit?foot('Yadda saxla',"QS.fl()"):foot('Davam et',"QS.nl()",0,"QS.go('prof')"))+'</div></div>';
+ +foot('Davam et',"QS.nl()",0,"QS.go('prof')")+'</div></div>';
 },
 
 picker:function(){
@@ -123,37 +120,12 @@ picker:function(){
 },
 
 prof:function(){return'<div class="scr"><div class="col">'+topBar(1)+'<div class="body"><h1>Profil məlumatlarını əlavə et</h1><p class="sub">Bu məlumatlar QısaGet səhifəndə görünəcək.</p><div class="avw"><div class="av'+(S.av?' has':'')+'" id="avp"'+avStyle()+'></div><label for="avf" aria-label="Şəkil yüklə">+</label><input id="avf" type="file" accept="image/*" hidden onchange="QS.av(this)"></div><label class="lab" for="pn">Görünən ad</label><input class="in" id="pn" maxlength="40" style="border-radius:16px;height:52px" value="'+esc(S.name)+'"><label class="lab" for="pb">Bioqrafiya</label><textarea class="in" id="pb" maxlength="160" placeholder="Nə etdiyini bir-iki cümlə ilə yaz" oninput="document.getElementById(\'cn\').textContent=this.value.length+\'/160\'">'+esc(S.bio)+'</textarea><div class="cnt" id="cn">'+S.bio.length+'/160</div></div>'
- +(S.edit?foot('Yadda saxla',"QS.done()"):foot('Davam et',"QS.go('theme')"))+'</div></div>'},
+ +foot('Davam et',"QS.go('theme')")+'</div></div>'},
 
 theme:function(){
  return'<div class="scr"><div class="tcol"><div class="top"><button class="bk" onclick="QS.bk()" aria-label="Geri">‹</button><div class="pg"><div style="width:100%"></div></div><div class="star">'+QLOGO+'</div></div><div class="stage">'+ph(S.th)+'</div><div class="sheet"><div class="sheet-in"><h2>Tema seç</h2><div class="th">'
  +TH.map(function(t,i){return'<button class="tt" aria-pressed="'+(S.th===i)+'" onclick="QS.th('+i+')"><div style="background:'+t.bg+';color:'+t.tx+';--b:'+t.bt+';--d:'+(t.bd||0)+';--s:'+(t.sh||'none')+'">Aa</div>'+t.n+'</button>'}).join('')
- +'</div>'+(S.edit?foot('Yadda saxla',"QS.done()",S.th<0):foot('Davam et',"QS.go('admin')",S.th<0))+'</div></div></div></div>';
-},
-
-admin:function(){
- var L=links(),p=pct();
- var lk=L.map(function(l){
-  var inner=(l.p?icon(l.p):'<div class="ic" style="background:#d4e81f;color:#111">∞</div>')+'<div style="flex:1;min-width:0"><b>'+esc(l.t)+'</b><small>'+esc(l.raw)+'</small>'+(l.url?'':'<small class="e">'+esc(l.err||'Düzgün link yerləşdirin.')+'</small>')+'</div>';
-  return l.url?'<a class="lc" href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer">'+inner+'</a>':'<div class="lc bad">'+inner+'</div>';
- }).join('');
- if(!lk)lk='<div class="lc empty">Hələ link yoxdur. «+ Əlavə et» düyməsi ilə başla.</div>';
- var so=S.plats.map(function(n){return icon(plat(n),1)}).join('');
- return'<div class="scr"><div class="adm"><div class="ah"><span class="ob">Ön sifariş</span><button class="sh" onclick="QS.shr()">⇪ QısaGet-ini paylaş</button></div>'
- +'<div class="pro"><div class="av'+(S.av?' has':'')+'"'+avStyle()+'></div><div><b>@'+esc(S.user||'adın')+'</b>'+(S.name?'<div class="pn">'+esc(S.name)+'</div>':'')+(S.bio?'<p class="pbio">'+esc(S.bio)+'</p>':'')+(so?'<div class="soc">'+so+'</div>':'')+'<button class="ed" onclick="QS.edit(\'prof\')">Profili redaktə et</button></div></div>'
- +'<div class="tabs"><button class="on">Linklər</button><button onclick="QS.soon()">Mağaza</button></div><div class="row2"><button class="pill" onclick="QS.soon()">▦ Kolleksiya əlavə et</button><button class="pill go" onclick="QS.edit(\'links\')">+ Əlavə et</button></div>'
- +'<div class="card"><h3>QısaGet məsləhəti</h3><div style="color:var(--mute)">Linklərini yenilə, ziyarətçilərin ən yeni məzmunu görsün.</div></div>'+lk
- +'<button class="lc url" onclick="QS.shr()">qisaget.az/'+esc(S.user||'adın')+'</button></div>'
- +'<div class="ring" style="--p:'+p+'%"><div>'+p+'%<br>tamam</div></div>'
- +'<div class="bn"><button onclick="QS.edit(\'links\')"><span>＋</span>Əlavə et</button><button onclick="QS.go(\'view\')"><span>◉</span>Önizləmə</button><button onclick="QS.edit(\'theme\')"><span>▭</span>Dizayn</button><button onclick="QS.soon(1)"><span>✦</span>Gücləndir</button></div></div>';
-},
-
-view:function(){
- var t=TH[S.th>-1?S.th:0],L=links().filter(function(l){return l.url});
- var so=S.plats.map(function(n){return icon(plat(n),1)}).join('');
- return'<div class="scr"><div class="pub" style="'+tv(t,'28px')+'"><div class="pbar"><button onclick="QS.bk()" aria-label="Geri">‹</button><span>qisaget.az/'+esc(S.user)+'</span><span class="sp"></span></div><div class="pi"><div class="av'+(S.av?' has':'')+'"'+avStyle()+'></div><h2>'+esc(S.name||'@'+S.user)+'</h2>'+(S.bio?'<p class="pbio">'+esc(S.bio)+'</p>':'')+(so?'<div class="psoc">'+so+'</div>':'')
- +(L.length?L.map(function(l){return'<a class="pbtn" href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer">'+esc(l.t)+'</a>'}).join(''):'<p class="pempty">Hələ link əlavə olunmayıb.</p>')
- +'<div class="pft">QısaGet'+QLOGO+'</div></div></div></div>';
+ +'</div>'+foot('Davam et',"QS.go('admin')",S.th<0)+'</div></div></div></div>';
 }
 };
 
@@ -162,10 +134,9 @@ function draw(){
  var s=S.scr,keep=(s===lastScr)?root.scrollTop:0;
  app.innerHTML=SC[s]();
  if(s==='theme')root.style.setProperty('--pg',S.th>-1?TH[S.th].pg:'#ececf0');
- else if(s==='view')root.style.setProperty('--pg',TH[S.th>-1?S.th:0].pg);
  else root.style.removeProperty('--pg');
  lastScr=s;root.scrollTop=keep;
- if(s==='join'||s==='login')chk();else if(s==='user')un();
+ if(s==='join')chk();else if(s==='user')un();
 }
 function save(){
  [].forEach.call(root.querySelectorAll('[data-k]'),function(e){S.v[e.getAttribute('data-k')]=e.value.trim()});
@@ -173,26 +144,29 @@ function save(){
  var pn=$('pn'),pb=$('pb');if(pn)S.name=pn.value.trim();if(pb)S.bio=pb.value.trim();
 }
 function focusFirst(){var f=app.querySelector('#em,#un,.codes input');if(f)try{f.focus({preventScroll:true})}catch(e){}}
-function go(s){save();S.h.push(S.scr);S.scr=s;savePreorder();draw();root.scrollTop=0;if(s==='user'||s==='code')focusFirst()}
-function bk(){save();S.scr=S.h.pop()||'join';if(S.scr==='admin')S.edit=false;draw();root.scrollTop=0}
-function edit(s){save();S.edit=true;S.h.push('admin');S.scr=s;draw();root.scrollTop=0}
-function done(){save();savePreorder();S.edit=false;S.h=['theme'];S.scr='admin';draw();root.scrollTop=0}
+function go(s){
+ if(s==='admin'){finish();return}
+ save();S.h.push(S.scr);S.scr=s;savePreorder();draw();root.scrollTop=0;if(s==='user'||s==='code')focusFirst()}
+/* Son addım: məlumatı yaz, sonra admin panelə keç. */
+function finish(){
+ save();
+ if(!SB){toast('Demo rejimi: admin panel üçün Supabase qoşulmalıdır.');return}
+ var b=$('nx');if(b)b.disabled=true;
+ savePreorder().then(function(ok){if(ok)location.href='admin.html';else if(b)b.disabled=false});
+}
+function bk(){save();S.scr=S.h.pop()||'join';draw();root.scrollTop=0}
 function toast(m){toastEl.textContent=m;toastEl.hidden=false;clearTimeout(tmr);tmr=setTimeout(function(){toastEl.hidden=true},2600)}
 function copy(t,cb){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){cb(true)},function(){cb(false)});return}}catch(e){}cb(false)}
 
-function openState(st){S=st;lastScr='';toastEl.hidden=true;noteHide();root.classList.add('open');document.body.style.overflow='hidden';draw();root.scrollTop=0}
+function openState(st){S=st;lastScr='';toastEl.hidden=true;root.classList.add('open');document.body.style.overflow='hidden';draw();root.scrollTop=0}
 function openReg(user){openState(fresh(user));setTimeout(focusFirst,60)}
-function closeReg(){root.classList.remove('open');document.body.style.overflow='';clearTimeout(tmr);toastEl.hidden=true;noteHide()}
+function closeReg(){root.classList.remove('open');document.body.style.overflow='';clearTimeout(tmr);toastEl.hidden=true}
 
 /* ---------- addım əməliyyatları ---------- */
 function chk(){var el=$('em');if(!el)return;var v=el.value.trim();S.email=v;$('nx').disabled=!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v)}
 function enter(e){if(e.key==='Enter'){e.preventDefault();var b=$('nx');if(b&&!b.disabled)b.click()}}
 function j1(g){if(g){toast('Google ilə giriş tezliklə aktiv olacaq.');return}go('user')}
-function login(){if(!SB){toast('Demo rejimində giriş yoxdur. Supabase qoşulandan sonra işləyəcək.');return}go('login')}
-function l1(){
- var b=$('nx');b.disabled=true;
- SB.auth.signInWithOtp({email:S.email.toLowerCase(),options:{shouldCreateUser:false}}).then(function(r){if(r.error)throw r.error;go('code')}).catch(function(err){var b2=$('nx');if(b2)b2.disabled=false;var m=(err&&err.message)||'',e=$('e');if(e)e.textContent=/signups not allowed|not found/i.test(m)?'Bu e-poçtla hesab tapılmadı. Qeydiyyatdan keç.':'Xəta oldu: '+(m||'bir az sonra yenidən yoxla')});
-}
+function login(){location.href='admin.html'}
 function un(){var el=$('un');if(!el)return;var v=clean(el.value);if(v!==el.value)el.value=v;S.user=v;$('nx').className='pill'+(validUser(v)?' go':'');$('e').textContent=''}
 function u1(){
  if(!validUser(S.user)){$('e').textContent='İstifadəçi adı ən azı 3 simvol olmalıdır.';return}
@@ -227,7 +201,7 @@ function c1(){
 function afterVerify(uid){
  return SB.from('preorders').select('*').eq('user_id',uid).maybeSingle().then(function(q){
   if(q.error)throw q.error;
-  if(q.data){openState(restore(q.data));return}
+  if(q.data){if(q.data.theme!=null){location.href='admin.html';return}openState(restore(q.data));return}
   S.uid=uid;
   if(!validUser(S.user)){S.h=[];S.scr='user';draw();root.scrollTop=0;return}
   return SB.from('preorders').upsert(rowData(),{onConflict:'user_id'}).then(function(w){
@@ -246,9 +220,9 @@ function rowData(){
 }
 function avStore(){try{if(S.uid&&S.av)localStorage.setItem('qs_av_'+S.uid,S.av)}catch(e){}}
 function savePreorder(){
- if(!SB||!S.uid)return;
+ if(!SB||!S.uid)return Promise.resolve(false);
  avStore();
- SB.from('preorders').upsert(rowData(),{onConflict:'user_id'}).then(function(r){if(r.error)throw r.error}).catch(function(err){toast(err&&err.code==='23505'?'Bu istifadəçi adı artıq götürülüb.':'Məlumat saxlanmadı. İnternetini yoxla və yenidən cəhd et.')});
+ return SB.from('preorders').upsert(rowData(),{onConflict:'user_id'}).then(function(r){if(r.error)throw r.error;return true}).catch(function(err){toast(err&&err.code==='23505'?'Bu istifadəçi adı artıq götürülüb.':'Məlumat saxlanmadı. İnternetini yoxla və yenidən cəhd et.');return false});
 }
 /* Supabase sətrindən qeydiyyat vəziyyətini bərpa et. Yarımçıq qalıbsa, qaldığı addımdan davam edir. */
 function restore(row){
@@ -265,8 +239,7 @@ function restore(row){
  for(var i=0;i<s.xn;i++){s.ex[i]=xs[i]||'';s.exp[i]=xp[i]||''}
  try{s.av=localStorage.getItem('qs_av_'+s.uid)||''}catch(e){}
  var ORD=['plan','purpose','plat','links','prof','theme'];
- if(s.th>-1){s.scr='admin';s.h=['theme']}
- else{s.scr=!s.purpose?'purpose':(!s.plats.length?'plat':'links');s.h=ORD.slice(0,ORD.indexOf(s.scr))}
+ s.scr=!s.purpose?'purpose':(!s.plats.length?'plat':(s.th>-1?'theme':'links'));s.h=ORD.slice(0,ORD.indexOf(s.scr));
  return s;
 }
 function pick(name){S.plan=name;go('purpose')}
@@ -289,30 +262,23 @@ function av(f){
  r.readAsDataURL(file);
 }
 function th(i){S.th=i;draw()}
-var noteT=0;
-function noteHide(){var n=$('reg-note');if(n)n.hidden=true;clearTimeout(noteT)}
-function shr(){
- var n=$('reg-note');if(!n)return;
- n.innerHTML='<button type="button" class="sx" onclick="QS.noteClose()" aria-label="Bağla">✕</button><div class="sn">Qisaget'+QLOGO+'</div><p>İstəyiniz üçün təşəkkürlər '+SMILE+'</p><p>Sizin üçün link hazır olan zaman bu gmailə linkinizi göndərəcəyik:<b>'+esc(S.email)+'</b></p>';
- n.hidden=false;clearTimeout(noteT);noteT=setTimeout(function(){n.hidden=true},12000);
-}
 function vfield(f){var inp=f.querySelector('input'),r=check(f.getAttribute('data-p'),inp.value);f.classList.toggle('bad',!!r.err);f.querySelector('.ferr').textContent=r.err;inp.setAttribute('aria-invalid',r.err?'true':'false');return r.err?inp:null}
 function vf(inp){vfield(inp.parentNode)}
 function vall(){var first=null;[].forEach.call(root.querySelectorAll('.fld[data-p]'),function(f){var b=vfield(f);if(b&&!first)first=b});if(first){try{first.focus()}catch(e){}}return!first}
 function nl(){if(vall())go('prof')}
-function fl(){if(vall())done()}
 function pickIcon(i){S.ls=root.scrollTop;S.pickFor=i;go('picker')}
 function pickBack(){S.scr=S.h.pop()||'links';draw();root.scrollTop=S.ls||0;[].forEach.call(root.querySelectorAll('.fld[data-p]'),function(f){if(f.querySelector('input').value.trim())vfield(f)})}
 function setIcon(n){S.exp[S.pickFor]=n;pickBack()}
 function soon(p){toast(p?'Pro planlar tezliklə aktiv olacaq.':'Bu bölmə tezliklə aktiv olacaq.')}
 
-window.QS={go:go,bk:bk,close:closeReg,edit:edit,done:done,chk:chk,enter:enter,j1:j1,login:login,l1:l1,un:un,u1:u1,cd:cd,cb:cb,cp:cp,resend:resend,c1:c1,pick:pick,sp:sp,tp:tp,addx:addx,av:av,th:th,shr:shr,soon:soon,vf:vf,nl:nl,fl:fl,pickIcon:pickIcon,setIcon:setIcon,pickBack:pickBack,noteClose:noteHide};
+window.QS={go:go,bk:bk,close:closeReg,chk:chk,enter:enter,j1:j1,login:login,un:un,u1:u1,cd:cd,cb:cb,cp:cp,resend:resend,c1:c1,pick:pick,sp:sp,tp:tp,addx:addx,av:av,th:th,soon:soon,vf:vf,nl:nl,pickIcon:pickIcon,setIcon:setIcon,pickBack:pickBack};
 
 /* Qayıdan istifadəçi: bu cihazda sessiya varsa, birbaşa admin panelə aç. */
 if(SB){SB.auth.getSession().then(function(r){
  var ss=r.data&&r.data.session;if(!ss||root.classList.contains('open'))return;
  return SB.from('preorders').select('*').eq('user_id',ss.user.id).maybeSingle().then(function(q){
-  if(q.data&&!root.classList.contains('open'))openState(restore(q.data));
+  if(!q.data||root.classList.contains('open'))return;
+  if(q.data.theme!=null)location.href='admin.html';else openState(restore(q.data));
  });
 }).catch(function(){})}
 

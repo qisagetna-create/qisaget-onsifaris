@@ -58,3 +58,27 @@ $$;
 drop trigger if exists preorders_updated on public.preorders;
 create trigger preorders_updated before update on public.preorders
   for each row execute function public.set_updated_at();
+
+-- ---------------------------------------------------------------
+-- Admin panel üçün əlavələr (əvvəlki hissədən sonra işə sal)
+-- ---------------------------------------------------------------
+
+-- Admin panelin profil məlumatı (ad, bio, linklər, dizayn və s.)
+alter table public.preorders add column if not exists profile jsonb not null default '{}'::jsonb;
+alter table public.preorders drop constraint if exists preorders_profile_size;
+alter table public.preorders add constraint preorders_profile_size check (octet_length(profile::text) < 200000);
+
+-- Şəkil anbarı: hamı görür, hər kəs yalnız öz qovluğuna (uid/) yazır, 1 MB, yalnız şəkil
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('media', 'media', true, 1048576, array['image/jpeg','image/png','image/webp'])
+on conflict (id) do nothing;
+
+drop policy if exists media_insert on storage.objects;
+drop policy if exists media_update on storage.objects;
+drop policy if exists media_delete on storage.objects;
+create policy media_insert on storage.objects for insert to authenticated
+  with check (bucket_id = 'media' and (storage.foldername(name))[1] = auth.uid()::text);
+create policy media_update on storage.objects for update to authenticated
+  using (bucket_id = 'media' and (storage.foldername(name))[1] = auth.uid()::text);
+create policy media_delete on storage.objects for delete to authenticated
+  using (bucket_id = 'media' and (storage.foldername(name))[1] = auth.uid()::text);

@@ -24,9 +24,12 @@ http.createServer((req, res) => {
   if (p.endsWith('/')) p += 'index.html';
   const file = path.normalize(path.join(root, p));
   if (file !== root && !file.startsWith(root + path.sep)) { res.writeHead(403); return res.end('Forbidden'); }
-  fs.readFile(file, (err, data) => {
+  const send = (f) => fs.readFile(f, (err, data) => {
     if (err) { res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' }); return res.end('Tapılmadı'); }
-    res.writeHead(200, { 'content-type': types[path.extname(file)] || 'application/octet-stream', 'cache-control': 'no-store' });
+    res.writeHead(200, { 'content-type': types[path.extname(f)] || 'application/octet-stream', 'cache-control': 'no-store' });
     res.end(data);
   });
+  // /admin kimi qısa ünvanlar admin.html faylını açır (Vercel-də cleanUrls ilə eyni)
+  if (!path.extname(file)) return fs.access(file + '.html', (e) => send(e ? file : file + '.html'));
+  send(file);
 }).listen(port, () => console.log('Qisaget işləyir: http://localhost:' + port));

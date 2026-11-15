@@ -20,15 +20,18 @@ Layihədə kənar paket yoxdur, ona görə `npm install` heç nə yükləmir və
 ```
 public/
   index.html        Açılış səhifəsi və qeydiyyat pəncərəsinin boş qabığı
+  admin.html        İdarə paneli (/admin): məzmun, başlıq, dizayn, önizləmə
   css/style.css     Bütün üslublar (qeydiyyat axını #reg altındadır)
   js/landing.js     Menyu, sual-cavab, sabit menyu çərçivəsi
   js/signup.js      Qeydiyyat axını (hər ekran bir funksiyadır)
 server.js           Yerli server
+vercel.json         Vercel ayarı (public qovluğu, /admin qısa ünvanı)
+supabase/schema.sql Cədvəl, qaydalar, şəkil anbarı
 ```
 
 ## Qeydiyyat axını
 
-Landing-də link adı yazılır, sonra: e-poçt, istifadəçi adı, kod, plan, məqsəd, platformalar, linklər, profil, tema, admin paneli.
+Landing-də link adı yazılır, sonra: e-poçt, istifadəçi adı, kod, plan, məqsəd, platformalar, linklər, profil, tema. Tema addımından sonra istifadəçi `/admin` panelinə keçir.
 
 ## Supabase qoşmaq (ön sifariş və e-poçt kodu)
 
@@ -45,14 +48,22 @@ Supabase-in daxili e-poçt göndərməsi saatda cəmi bir neçə mesajla məhdud
 ### Məlumat necə saxlanır
 
 - Kod təsdiqlənən kimi e-poçt və istifadəçi adı `preorders` cədvəlinə yazılır. Sonra plan, məqsəd, platformalar, linklər, ad, bio və tema hər addımda yenilənir.
-- Eyni cihazda sayta yenidən girəndə sessiya yadda qalır və istifadəçi birbaşa admin panelə düşür. Başqa cihazda "Daxil ol" düyməsi ilə e-poçta gələn kodla daxil olur.
-- Admin paneldə "Ön sifariş" nişanı göstərilir.
+- Eyni cihazda sayta yenidən girəndə sessiya yadda qalır və istifadəçi birbaşa admin panelə düşür. Başqa cihazda "Daxil ol" düyməsi admin panelin giriş səhifəsinə aparır, e-poçta gələn kodla daxil olur. Yalnız qeydiyyatdan keçmiş e-poçtlar daxil ola bilir.
+- Admin panelin məlumatı (ad, bio, linklər, sosial hesablar, dizayn, şəkil) `preorders.profile` sütununda saxlanır. İlk girişdə qeydiyyatdakı məlumatlardan avtomatik hazırlanır. Profil şəkli `media` anbarına yüklənir.
+- Admin paneldə "Ön sifariş" nişanı göstərilir. "Paylaş" düyməsi hələlik linkin hazır olanda e-poçta göndəriləcəyini bildirən mesaj göstərir.
+- Admin paneldə istifadəçi adını dəyişəndə yeni ad `username_taken` ilə yoxlanılır və `preorders` cədvəlində yenilənir.
+
+Supabase-də `supabase/schema.sql` faylının bütün hissələrini işə salmaq lazımdır, çünki admin panel `profile` sütunundan və `media` anbarından istifadə edir.
 
 ## Hələ qoşulmayıb
 
-- Profil şəkli hələ Supabase-ə yüklənmir, yalnız həmin cihazın brauzerində qalır.
-- Açıq profil səhifəsi (`qisaget.az/ad`) hələ yoxdur.
+- Açıq profil səhifəsi (`qisaget.az/ad`) hələ yoxdur. Admin paneldəki "Öz səhifəni aç" düyməsi bu səbəbdən mesaj göstərir.
+- Admin paneldə Kolleksiya, Mağaza ödənişi və Gücləndir bölmələri "Tezliklə" göstərir.
 - Google ilə giriş, Pro planlar və footer sosial linkləri (`#`) hələ aktiv deyil.
+
+## Vercel-də yayımlamaq
+
+GitHub reposunu Vercel-ə bağla. `vercel.json` faylı `public` qovluğunu yayımlayır və `/admin` ünvanını `admin.html` ilə eyniləşdirir. Supabase-də Authentication, URL Configuration bölməsinə Vercel və qisaget.az ünvanlarını yaz.
 
 ## GitHub-a yükləmək
 
