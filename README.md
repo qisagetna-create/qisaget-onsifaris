@@ -53,10 +53,10 @@ Google ilə giriş düyməsi Supabase OAuth-dan istifadə edir; işləməsi üç
 
 1. Google Cloud Console-da OAuth 2.0 Web client yarat. Authorized redirect URI kimi `https://lfnuyzzmfcnkfwfrbktw.supabase.co/auth/v1/callback` əlavə et.
 2. Supabase Dashboard-da Authentication → Sign In / Providers → Google bölməsində Google Client ID və Client Secret-i daxil edib provider-i aktiv et.
-3. Authentication → URL Configuration → Redirect URLs siyahısına lokal `http://localhost:4321/` və yayımdakı saytın tam URL-ni əlavə et.
+3. Authentication → URL Configuration → Redirect URLs siyahısına lokal `http://localhost:3000/` (və `127.0.0.1` ilə açırsansa `http://127.0.0.1:3000/`) və yayımdakı saytın tam URL-ni əlavə et.
 4. Client Secret-i yalnız Supabase Dashboard-a daxil et; `config.js`-ə, GitHub-a və ya brauzer koduna yazma.
 
-Giriş zamanı Google hesab seçimi soruşulur. Yeni Google istifadəçisi təsdiqdən sonra istifadəçi adını seçib qeydiyyata davam edir. Mövcud hesabda profil varsa, əvvəlki qeydiyyat bərpa olunur.
+Google düyməsi hesab seçimini açır. Yeni istifadəçi seçilmiş Google e-poçt ünvanını qeydiyyat formasında görür; ünvan təsdiqləndiyi üçün e-poçt kodu addımı təkrarlanmır. Sonra istifadəçi adı seçib qeydiyyata davam edir. Mövcud hesabda profil varsa, əvvəlki qeydiyyat bərpa olunur.
 
 ### Məlumat necə saxlanır
 
