@@ -21,14 +21,21 @@ const types = {
 http.createServer((req, res) => {
   let p;
   try { p = decodeURIComponent(req.url.split('?')[0]); } catch (e) { res.writeHead(400); return res.end('Bad request'); }
-  if (p.endsWith('/')) p += 'index.html';
-  const file = path.normalize(path.join(root, p));
-  if (file !== root && !file.startsWith(root + path.sep)) { res.writeHead(403); return res.end('Forbidden'); }
+
+  const requested = p === '/' ? '/index.html' : p;
+  const file = path.resolve(root, `.${requested}`);
+  const rootDir = path.resolve(root);
+  if (file !== rootDir && !file.startsWith(rootDir + path.sep)) {
+    res.writeHead(403, { 'content-type': 'text/plain; charset=utf-8' });
+    return res.end('Forbidden');
+  }
+
   const send = (f) => fs.readFile(f, (err, data) => {
     if (err) { res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' }); return res.end('Tapılmadı'); }
     res.writeHead(200, { 'content-type': types[path.extname(f)] || 'application/octet-stream', 'cache-control': 'no-store' });
     res.end(data);
   });
+
   // /admin kimi qısa ünvanlar admin.html faylını açır (Vercel-də cleanUrls ilə eyni)
   if (!path.extname(file)) return fs.access(file + '.html', (e) => send(e ? file : file + '.html'));
   send(file);

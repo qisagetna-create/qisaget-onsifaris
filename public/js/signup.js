@@ -79,7 +79,7 @@ function ph(i){
 
 /* ---------- ekranlar ---------- */
 var SC={
-join:function(){return'<div class="scr"><div class="split"><div class="lf"><div class="fm">'+logo()+'<button class="back" onclick="QS.close()">‹ Ana səhifə</button><h1>QısaGet-ə qoşul</h1><p class="sub">Pulsuz qeydiyyatdan keç!</p><input class="in" id="em" type="email" aria-label="E-poçt" placeholder="E-poçt" autocomplete="email" autocapitalize="off" spellcheck="false" value="'+esc(S.email)+'" oninput="QS.chk()" onkeydown="QS.enter(event)"><div class="err" id="e"></div><button class="pill go" id="nx" disabled onclick="QS.j1()">Davam et</button><p class="fine"><b>Davam et</b> düyməsinə basaraq QısaGet-in <u>məxfilik bildirişini</u> və <u>şərtlərini</u> qəbul edir, yeniliklər və təkliflər almağa razılıq verirsən.</p><div class="or">VƏ YA</div><button class="pill" onclick="QS.j1(1)"><b style="color:#4285f4">G</b> Google ilə davam et</button><div class="hint">Artıq hesabın var? <button class="lnk" onclick="QS.login()">Daxil ol</button></div></div></div>'+art()+'</div></div>'},
+join:function(){return'<div class="scr"><div class="split"><div class="lf"><div class="fm"><div class="join-head"><button class="back back-icon" aria-label="Ana səhifəyə qayıt" onclick="QS.close()">‹</button><h1 class="join-title"><span class="join-brand">QısaGet<svg class="qlogo join-logo" aria-hidden="true"><use href="#qlogo"/></svg></span><span class="join-rest">-ə qoşul</span></h1></div><p class="sub">Pulsuz qeydiyyatdan keç!</p><input class="in" id="em" type="email" aria-label="E-poçt" placeholder="E-poçt" autocomplete="email" autocapitalize="off" spellcheck="false" value="'+esc(S.email)+'" oninput="QS.chk()" onkeydown="QS.enter(event)"><div class="err" id="e"></div><button class="pill go" id="nx" disabled onclick="QS.j1()">Davam et</button><p class="fine"><b>Davam et</b> düyməsinə basaraq QısaGet-in <u>məxfilik bildirişini</u> və <u>şərtlərini</u> qəbul edir, yeniliklər və təkliflər almağa razılıq verirsən.</p><div class="or">VƏ YA</div><button class="pill" onclick="QS.j1(1)"><b style="color:#4285f4">G</b> Google ilə davam et</button><div class="hint">Artıq hesabın var? <button class="lnk" onclick="QS.login()">Daxil ol</button></div></div></div>'+art()+'</div></div>'},
 
 user:function(){return'<div class="scr"><div class="split"><div class="lf"><div class="fm">'+logo()+'<button class="back" onclick="QS.bk()">‹ Geri</button><h1>İstifadəçi adını seç</h1><p class="sub" style="font-size:14.5px">Asan tanınmaq üçün sosial şəbəkədəki adına yaxın ad seç.</p><div class="pre"><span>qisaget.az/</span><div style="flex:1;min-width:0"><label for="un">istifadəçi adı</label><input id="un" value="'+esc(S.user)+'" maxlength="24" autocomplete="off" autocapitalize="off" spellcheck="false" oninput="QS.un()" onkeydown="QS.enter(event)"></div></div><div class="err" id="e"></div><button class="pill" id="nx" onclick="QS.u1()">Davam et</button></div></div>'+art()+'</div></div>'},
 
@@ -165,7 +165,28 @@ function closeReg(){root.classList.remove('open');document.body.style.overflow='
 /* ---------- addım əməliyyatları ---------- */
 function chk(){var el=$('em');if(!el)return;var v=el.value.trim();S.email=v;$('nx').disabled=!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v)}
 function enter(e){if(e.key==='Enter'){e.preventDefault();var b=$('nx');if(b&&!b.disabled)b.click()}}
-function j1(g){if(g){toast('Google ilə giriş tezliklə aktiv olacaq.');return}go('user')}
+var GOOGLE_INTENT='qisaget_google_signup';
+function clearGoogleIntent(){try{sessionStorage.removeItem(GOOGLE_INTENT)}catch(e){console.error('Google giriş vəziyyətini silmək alınmadı.',e)}}
+function takeGoogleIntent(){
+ try{
+  var raw=sessionStorage.getItem(GOOGLE_INTENT);if(!raw)return null;
+  sessionStorage.removeItem(GOOGLE_INTENT);
+  var intent=JSON.parse(raw);
+  return{user:clean(intent.username||'')};
+ }catch(e){console.error('Google qeydiyyat məlumatını oxumaq alınmadı.',e);return null}
+}
+function j1(g){
+ if(g){
+  if(!SB){toast('Google ilə giriş üçün Supabase qoşulmalıdır.');return}
+  try{sessionStorage.setItem(GOOGLE_INTENT,JSON.stringify({username:S.user||''}))}
+  catch(e){console.error('Google girişinə hazırlıq alınmadı.',e);toast('Google ilə giriş başlatmaq mümkün olmadı. Yenidən cəhd et.');return}
+  SB.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+'/',queryParams:{prompt:'select_account'}}}).then(function(r){
+   if(r.error){clearGoogleIntent();console.error('Google OAuth başladıla bilmədi.',r.error);toast('Google ilə giriş başladıla bilmədi: '+r.error.message)}
+  }).catch(function(e){clearGoogleIntent();console.error('Google OAuth zamanı xəta oldu.',e);toast('Google ilə giriş alınmadı. Yenidən cəhd et.')});
+  return
+ }
+ go('user')
+}
 function login(){location.href='/admin'}
 function un(){var el=$('un');if(!el)return;var v=clean(el.value);if(v!==el.value)el.value=v;S.user=v;$('nx').className='pill'+(validUser(v)?' go':'');$('e').textContent=''}
 function u1(){
@@ -273,23 +294,38 @@ function soon(p){toast(p?'Pro planlar tezliklə aktiv olacaq.':'Bu bölmə tezli
 
 window.QS={go:go,bk:bk,close:closeReg,chk:chk,enter:enter,j1:j1,login:login,un:un,u1:u1,cd:cd,cb:cb,cp:cp,resend:resend,c1:c1,pick:pick,sp:sp,tp:tp,addx:addx,av:av,th:th,soon:soon,vf:vf,nl:nl,pickIcon:pickIcon,setIcon:setIcon,pickBack:pickBack};
 
-/* Qayıdan istifadəçi: bu cihazda sessiya varsa, birbaşa admin panelə aç. */
+/* Qayıdan istifadəçi: sessiyanı və varsa OAuth-dan qayıdan qeydiyyatı bərpa et. */
 if(SB){SB.auth.getSession().then(function(r){
- var ss=r.data&&r.data.session;if(!ss||root.classList.contains('open'))return;
+ if(r.error)throw r.error;
+ var ss=r.data&&r.data.session;
+ if(!ss){
+  if(new URLSearchParams(location.search).has('error')){
+   clearGoogleIntent();openReg();toast('Google ilə giriş alınmadı. Yenidən cəhd et.');
+  }
+  return
+ }
+ if(root.classList.contains('open'))return;
  return SB.from('preorders').select('*').eq('user_id',ss.user.id).maybeSingle().then(function(q){
-  if(!q.data||root.classList.contains('open'))return;
-  if(q.data.theme!=null)location.href='/admin';else openState(restore(q.data));
+  if(q.error)throw q.error;
+  if(root.classList.contains('open'))return;
+  if(q.data){clearGoogleIntent();if(q.data.theme!=null)location.href='/admin';else openState(restore(q.data));return}
+  var intent=takeGoogleIntent();if(!intent)return;
+  var st=fresh(intent.user);st.uid=ss.user.id;st.email=ss.user.email||'';st.scr='user';st.h=[];
+  openState(st);
  });
-}).catch(function(){})}
+}).catch(function(e){
+ console.error('İstifadəçi sessiyasını yoxlamaq alınmadı.',e);
+ if(!root.classList.contains('open'))openReg();
+ toast('Hesab məlumatını yükləmək alınmadı. Yenidən cəhd et.')
+})}
 
 /* ---------- landing ilə əlaqə ---------- */
 document.querySelectorAll('.urlfield input').forEach(function(i){i.addEventListener('input',function(){var c=clean(i.value);if(c!==i.value)i.value=c;i.parentElement.classList.remove('err')})});
 window.startOnboarding=function(e,f){
  e.preventDefault();
- var i=f.querySelector('.urlfield input'),v=clean(i.value);
- if(!validUser(v)){i.parentElement.classList.add('err');i.placeholder='ən azı 3 simvol';i.focus();return false}
- openReg(v);return false;
+ var i=f.querySelector('.urlfield input'),v=i?clean(i.value):'';
+ openReg(validUser(v)?v:'');return false;
 };
-document.querySelectorAll('a[href="#signup"]').forEach(function(a){a.addEventListener('click',function(){setTimeout(function(){var i=document.querySelector('#signup .urlfield input');if(i)try{i.focus({preventScroll:true})}catch(e){}},600)})});
+document.querySelectorAll('a[href="#signup"]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();openReg()})});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&root.classList.contains('open'))closeReg()});
 })();

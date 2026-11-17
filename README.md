@@ -20,10 +20,12 @@ Layihədə kənar paket yoxdur, ona görə `npm install` heç nə yükləmir və
 ```
 public/
   index.html        Açılış səhifəsi və qeydiyyat pəncərəsinin boş qabığı
+  info.html         Footer keçidləri üçün məlumat səhifəsi
   admin.html        İdarə paneli (/admin): məzmun, başlıq, dizayn, önizləmə
   css/style.css     Bütün üslublar (qeydiyyat axını #reg altındadır)
   js/landing.js     Menyu, sual-cavab, sabit menyu çərçivəsi
   js/signup.js      Qeydiyyat axını (hər ekran bir funksiyadır)
+  js/footer-pages.js Footer səhifələrinin məzmunu və keçidləri
 server.js           Yerli server
 vercel.json         Vercel ayarı (public qovluğu, /admin qısa ünvanı)
 supabase/schema.sql Cədvəl, qaydalar, şəkil anbarı
@@ -45,6 +47,17 @@ Supabase-in daxili e-poçt göndərməsi saatda cəmi bir neçə mesajla məhdud
 
 `config.js` boş qalarsa, sayt demo rejimdə işləyir.
 
+### Google ilə giriş
+
+Google ilə giriş düyməsi Supabase OAuth-dan istifadə edir; işləməsi üçün Google və Supabase panellərində birdəfəlik sazlama lazımdır:
+
+1. Google Cloud Console-da OAuth 2.0 Web client yarat. Authorized redirect URI kimi `https://lfnuyzzmfcnkfwfrbktw.supabase.co/auth/v1/callback` əlavə et.
+2. Supabase Dashboard-da Authentication → Sign In / Providers → Google bölməsində Google Client ID və Client Secret-i daxil edib provider-i aktiv et.
+3. Authentication → URL Configuration → Redirect URLs siyahısına lokal `http://localhost:4321/` və yayımdakı saytın tam URL-ni əlavə et.
+4. Client Secret-i yalnız Supabase Dashboard-a daxil et; `config.js`-ə, GitHub-a və ya brauzer koduna yazma.
+
+Giriş zamanı Google hesab seçimi soruşulur. Yeni Google istifadəçisi təsdiqdən sonra istifadəçi adını seçib qeydiyyata davam edir. Mövcud hesabda profil varsa, əvvəlki qeydiyyat bərpa olunur.
+
 ### Məlumat necə saxlanır
 
 - Kod təsdiqlənən kimi e-poçt və istifadəçi adı `preorders` cədvəlinə yazılır. Sonra plan, məqsəd, platformalar, linklər, ad, bio və tema hər addımda yenilənir.
@@ -59,7 +72,8 @@ Supabase-də `supabase/schema.sql` faylının bütün hissələrini işə salmaq
 
 - Açıq profil səhifəsi (`qisaget.az/ad`) hələ yoxdur. Admin paneldəki "Öz səhifəni aç" düyməsi bu səbəbdən mesaj göstərir.
 - Admin paneldə Kolleksiya, Mağaza ödənişi və Gücləndir bölmələri "Tezliklə" göstərir.
-- Google ilə giriş, Pro planlar və footer sosial linkləri (`#`) hələ aktiv deyil.
+- Google OAuth düyməsinin işləməsi üçün Supabase-də Google Client ID/Secret sazlanmalıdır; Pro planlar və footer sosial linkləri (`#`) hələ aktiv deyil.
+- Footer-in məlumat keçidləri `info.html?page=...` ünvanında açılır. Hazır olmayan xidmətlər həmin səhifələrdə aktiv funksiya kimi təqdim edilmir; hüquqi mətnlər yayımdan əvvəl yoxlanmalıdır.
 
 ## Vercel-də yayımlamaq
 
