@@ -89,12 +89,24 @@ svg.sn path,.sn path{stroke:#000;stroke-width:.9;stroke-linejoin:round;paint-ord
 .sg .row{gap:12px}
 .gw a.lnkx{display:inline-block;margin-top:14px;font-weight:600;text-decoration:underline}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Açılış animasiyası (splash): yalnız bu cihazda giriş yadda qalıbsa göstərilir */
+#qs-splash{display:none;--qs-bg:#fff;--qs-fg:#000}
+html.qs-splash #qs-splash{display:grid;position:fixed;inset:0;z-index:9999;place-items:center;background:var(--qs-bg);transition:opacity .45s ease}
+#qs-splash.out{opacity:0;pointer-events:none}
+#qs-splash svg{width:min(34vw,150px);height:auto;fill:var(--qs-fg);overflow:visible}
+#qs-splash .mc{transform-box:fill-box;transform-origin:center;animation:qsc .5s cubic-bezier(.2,.8,.2,1) both}
+#qs-splash .sp{transform-box:fill-box;transform-origin:50% 0;animation:qss .55s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.4s + var(--i)*.15s)}
+@keyframes qsc{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes qss{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){#qs-splash .mc,#qs-splash .sp{animation:none}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="js/config.js"></script>
+<script src="js/boot.js"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="qlogo" viewBox="0 0 100 100"><path fill-rule="evenodd" d="M44.3 0.0L44.3 31.1L44.0 31.4L39.7 31.3L18.2 9.3L17.2 8.8L10.7 15.5L32.5 37.6L31.4 38.7L31.4 44.8L0.0 45.0L0.0 54.5L31.3 54.5L31.4 60.8L32.1 61.5L10.7 82.8L16.7 88.8L17.7 89.3L38.7 68.0L44.3 68.0L44.5 99.8L55.7 99.8L55.5 68.2L61.0 68.0L82.3 89.5L89.2 82.6L68.2 61.5L68.7 60.8L68.7 54.6L99.7 54.5L99.8 44.8L68.9 44.7L68.7 38.7L67.5 37.3L89.2 15.3L82.3 8.6L59.8 31.3L56.0 31.4L55.7 31.1L55.8 0.2ZM40.2 39.0L60.0 39.0L61.3 40.5L61.3 59.3L59.8 60.8L40.2 60.8L38.8 59.5L38.7 40.5Z"/></symbol></svg>
+<div id="qs-splash" aria-hidden="true"><svg viewBox="0 0 100 100"><defs><mask id="qsm" maskUnits="userSpaceOnUse" x="-10" y="-10" width="120" height="120"><circle class="mc" cx="50" cy="50" r="17" fill="#fff"/><g transform="rotate(0 50 50)"><rect class="sp" style="--i:0" x="42.5" y="50" width="15" height="52" fill="#fff"/></g><g transform="rotate(45 50 50)"><rect class="sp" style="--i:1" x="42.5" y="50" width="15" height="52" fill="#fff"/></g><g transform="rotate(90 50 50)"><rect class="sp" style="--i:2" x="42.5" y="50" width="15" height="52" fill="#fff"/></g><g transform="rotate(135 50 50)"><rect class="sp" style="--i:3" x="42.5" y="50" width="15" height="52" fill="#fff"/></g><g transform="rotate(180 50 50)"><rect class="sp" style="--i:4" x="42.5" y="50" width="15" height="52" fill="#fff"/></g><g transform="rotate(225 50 50)"><rect class="sp" style="--i:5" x="42.5" y="50" width="15" height="52" fill="#fff"/></g><g transform="rotate(270 50 50)"><rect class="sp" style="--i:6" x="42.5" y="50" width="15" height="52" fill="#fff"/></g><g transform="rotate(315 50 50)"><rect class="sp" style="--i:7" x="42.5" y="50" width="15" height="52" fill="#fff"/></g></mask></defs><g mask="url(#qsm)"><use href="#qlogo" width="100" height="100"/></g></svg></div>
 <div id="app"></div>
 <script>
 const CF=window.QISAGET_CONFIG||{};let sb=null;try{if(CF.SUPABASE_URL&&CF.SUPABASE_ANON_KEY&&window.supabase)sb=window.supabase.createClient(CF.SUPABASE_URL,CF.SUPABASE_ANON_KEY)}catch(e){sb=null}
@@ -309,13 +321,19 @@ function hydrate(r){const p=r.profile||{};S.user=r.username;
  if(p.D){S.name=p.name||"";S.bio=p.bio||"";S.avatar=p.avatar||"";S.ts=p.ts||"text";S.soc=p.soc||{};S.links=p.links||[];S.prods=p.prods||[];S.D=Object.assign({},S.D,p.D)}
  else seed(r);
  SV=JSON.stringify(S.D);H=[SV];hi=0;return !!p.D}
-async function boot(){
+const MIN_MS=2400; /* splash ən azı bu qədər millisaniyə görünür (səhifə açılandan etibarən) */
+function endSplash(){const el=document.getElementById("qs-splash");if(!el||!el.isConnected)return;
+ setTimeout(()=>{el.classList.add("out");setTimeout(()=>{el.remove();document.documentElement.classList.remove("qs-splash")},460)},Math.max(0,MIN_MS-performance.now()))}
+setTimeout(endSplash,12000);
+async function boot(){try{await boot0()}catch(e){try{gate("Xəta oldu: "+(e&&e.message||e))}catch(_){}}finally{endSplash()}}
+async function boot0(){
  if(!sb)return nosb();
  const g=await sb.auth.getSession();if(!g.data.session)return gate();
  me=g.data.session.user;EMAIL=me.email||"";
  const r=await sb.from("preorders").select("*").eq("user_id",me.id).maybeSingle();
  if(r.error)return gate("Bazaya qoşulmaq alınmadı: "+r.error.message);
  if(!r.data)return nogo();
+ if(r.data.theme==null){location.replace("/?signup=1");return}
  EMAIL=r.data.email||EMAIL;
  const had=hydrate(r.data);render();
  if(!had){persist();seedAvatar()}}
