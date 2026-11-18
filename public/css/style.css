@@ -220,3 +220,4 @@ background:var(--pg,var(--bg));color:var(--ink);font:400 16px/1.45 "Instrument S
   .info-section p,.info-section li{font-size:15px}
   .info-page .footer{margin:0;padding:30px 22px 36px}
 }
+#reg .pill .gico{flex:none;display:block}
