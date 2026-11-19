@@ -245,7 +245,7 @@ const A={
  pdel(t){if(confirm("Məhsul silinsin?")){S.prods=S.prods.filter(x=>x.id!==+t.dataset.i);render();persist()}},
  ptab(t){ptab=t.dataset.v;upd()},ov(){pvOpen=true;render()},ovx(){pvOpen=false;render()},open(){modal="note";render()},
  share(){modal="note";render()},
- acct(){modal="acct";render()},async out(){await sb.auth.signOut();location.reload()},
+ acct(){modal="acct";render()},async out(){try{await sb.auth.signOut()}catch(e){console.error('Çıxış zamanı xəta oldu.',e)}location.href='/'},
  dsub(t){sub=t.dataset.v;render()},dback(){sub="";render()},
  theme(t){const i=+t.dataset.i;S.D=Object.assign({},S.D,TH[i],{th:i});if(TH[i].gp>=0)S.D.bs="grad";push();render()},
  shuffle(){A.theme({dataset:{i:Math.floor(Math.random()*TH.length)}})},
