@@ -185,7 +185,20 @@ function j1(g){
   }).catch(function(e){clearGoogleIntent();console.error('Google OAuth zamanı xəta oldu.',e);toast('Google ilə giriş alınmadı. Yenidən cəhd et.')});
   return
  }
- go('user')
+ sendCode();
+}
+/* E-poçta (və ya Google hesabının e-poçtuna) 6 rəqəmli kod göndər, sonra kod ekranını aç. */
+function sendCode(){
+ if(!SB){go('code');return}
+ var b=$('nx');if(b)b.disabled=true;
+ SB.auth.signInWithOtp({email:S.email.toLowerCase(),options:{shouldCreateUser:true}}).then(function(r){
+  if(r.error)throw r.error;
+  go('code');
+ }).catch(function(err){
+  console.error('Kod göndərilmədi.',err);
+  var b2=$('nx');if(b2)b2.disabled=false;
+  var e=$('e');if(e)e.textContent='Kod göndərilmədi: '+((err&&err.message)||'bir az sonra yenidən yoxla');
+ });
 }
 function login(){location.href='/admin'}
 function un(){var el=$('un');if(!el)return;var v=clean(el.value);if(v!==el.value)el.value=v;S.user=v;$('nx').className='pill'+(validUser(v)?' go':'');$('e').textContent=''}
@@ -196,8 +209,8 @@ function u1(){
  SB.rpc('username_taken',{u:S.user}).then(function(r){
   if(r.error)throw r.error;
   if(r.data){var b1=$('nx');if(b1)b1.disabled=false;$('e').textContent='Bu ad artıq götürülüb. Başqa ad seç.';return}
-  if(S.uid){go('plan');return}
-  return SB.auth.signInWithOtp({email:S.email.toLowerCase(),options:{shouldCreateUser:true}}).then(function(r2){if(r2.error)throw r2.error;go('code')});
+  if(S.uid)return createRow();
+  return sendCode();
  }).catch(function(err){var b2=$('nx');if(b2)b2.disabled=false;var e=$('e');if(e)e.textContent='Xəta oldu: '+((err&&err.message)||'bir az sonra yenidən yoxla')});
 }
 function codeInputs(){return root.querySelectorAll('.codes input')}
@@ -225,13 +238,17 @@ function afterVerify(uid){
   if(q.data){if(q.data.theme!=null){location.href='/admin';return}openState(restore(q.data));return}
   S.uid=uid;
   if(!validUser(S.user)){S.h=[];S.scr='user';draw();root.scrollTop=0;return}
-  return SB.from('preorders').upsert(rowData(),{onConflict:'user_id'}).then(function(w){
-   if(w.error){
-    if(w.error.code==='23505'){S.h=[];S.scr='user';draw();root.scrollTop=0;var e=$('e');if(e)e.textContent='Bu ad artıq götürülüb. Başqa ad seç.';return}
-    throw w.error;
-   }
-   avStore();S.h=[];S.scr='plan';draw();root.scrollTop=0;
-  });
+  return createRow();
+ });
+}
+/* Yeni istifadəçi: qeydi yarat (ad götürülübsə ad ekranına qaytar), sonra planlara keç. */
+function createRow(){
+ return SB.from('preorders').upsert(rowData(),{onConflict:'user_id'}).then(function(w){
+  if(w.error){
+   if(w.error.code==='23505'){var b=$('nx');if(b)b.disabled=false;if(S.scr!=='user'){S.h=[];S.scr='user';draw();root.scrollTop=0}var e=$('e');if(e)e.textContent='Bu ad artıq götürülüb. Başqa ad seç.';return}
+   throw w.error;
+  }
+  avStore();S.h=[];S.scr='plan';draw();root.scrollTop=0;
  });
 }
 function rowData(){
