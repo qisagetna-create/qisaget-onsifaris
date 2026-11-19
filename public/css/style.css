@@ -221,3 +221,16 @@ background:var(--pg,var(--bg));color:var(--ink);font:400 16px/1.45 "Instrument S
   .info-page .footer{margin:0;padding:30px 22px 36px}
 }
 #reg .pill .gico{flex:none;display:block}
+
+/* basılma hissi */
+.limebtn,nav .pill{transition:background-color .15s,transform .12s,box-shadow .15s}
+.limebtn:active,.limebtn.pressed{background:#6dc29c;color:#10261f;transform:scale(.97)}
+nav .pill:active,nav .pill.pressed{background:#4a5b68;transform:scale(.97)}
+/* yüklənmə işarəsi */
+@keyframes qsspin{to{transform:rotate(360deg)}}
+#reg .pill.busy{pointer-events:none}
+#reg .pill.busy::before{content:"";flex:none;width:16px;height:16px;border:2.5px solid currentColor;border-right-color:transparent;border-radius:50%;animation:qsspin .6s linear infinite}
+#reg .pill.busy[disabled]{background:var(--bt);color:var(--btx);border-color:var(--bt);opacity:.9}
+/* Google-dan qayıdış: əsas səhifə görünməsin */
+html.qs-oauth::before{content:"";position:fixed;inset:0;background:#fff;z-index:2147483646}
+html.qs-oauth::after{content:"";position:fixed;left:50%;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border:3px solid #111;border-right-color:transparent;border-radius:50%;animation:qsspin .7s linear infinite;z-index:2147483647}

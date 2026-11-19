@@ -158,11 +158,14 @@ function bk(){save();S.scr=S.h.pop()||'join';draw();root.scrollTop=0}
 function toast(m){toastEl.textContent=m;toastEl.hidden=false;clearTimeout(tmr);tmr=setTimeout(function(){toastEl.hidden=true},2600)}
 function copy(t,cb){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){cb(true)},function(){cb(false)});return}}catch(e){}cb(false)}
 
-function openState(st){S=st;lastScr='';toastEl.hidden=true;root.classList.add('open');document.body.style.overflow='hidden';draw();root.scrollTop=0}
+function openState(st){endOAuth();S=st;lastScr='';toastEl.hidden=true;root.classList.add('open');document.body.style.overflow='hidden';draw();root.scrollTop=0}
 function openReg(user){openState(fresh(user));setTimeout(focusFirst,60)}
 function closeReg(){root.classList.remove('open');document.body.style.overflow='';clearTimeout(tmr);toastEl.hidden=true}
 
 /* ---------- addım əməliyyatları ---------- */
+function setBusy(on){var b=$('nx');if(!b)return;b.disabled=on;b.classList.toggle('busy',on)}
+function endOAuth(){document.documentElement.classList.remove('qs-oauth')}
+setTimeout(endOAuth,8000);
 function chk(){var el=$('em');if(!el)return;var v=el.value.trim();S.email=v;$('nx').disabled=!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v)}
 function enter(e){if(e.key==='Enter'){e.preventDefault();var b=$('nx');if(b&&!b.disabled)b.click()}}
 var GOOGLE_INTENT='qisaget_google_signup';
@@ -190,13 +193,13 @@ function j1(g){
 /* E-poçta (və ya Google hesabının e-poçtuna) 6 rəqəmli kod göndər, sonra kod ekranını aç. */
 function sendCode(){
  if(!SB){go('code');return}
- var b=$('nx');if(b)b.disabled=true;
+ setBusy(true);
  SB.auth.signInWithOtp({email:S.email.toLowerCase(),options:{shouldCreateUser:true}}).then(function(r){
   if(r.error)throw r.error;
   go('code');
  }).catch(function(err){
   console.error('Kod göndərilmədi.',err);
-  var b2=$('nx');if(b2)b2.disabled=false;
+  setBusy(false);
   var e=$('e');if(e)e.textContent='Kod göndərilmədi: '+((err&&err.message)||'bir az sonra yenidən yoxla');
  });
 }
@@ -205,13 +208,13 @@ function un(){var el=$('un');if(!el)return;var v=clean(el.value);if(v!==el.value
 function u1(){
  if(!validUser(S.user)){$('e').textContent='İstifadəçi adı ən azı 3 simvol olmalıdır.';return}
  if(!SB){go('code');return}
- var b=$('nx');b.disabled=true;
+ setBusy(true);
  SB.rpc('username_taken',{u:S.user}).then(function(r){
   if(r.error)throw r.error;
-  if(r.data){var b1=$('nx');if(b1)b1.disabled=false;$('e').textContent='Bu ad artıq götürülüb. Başqa ad seç.';return}
+  if(r.data){setBusy(false);$('e').textContent='Bu ad artıq götürülüb. Başqa ad seç.';return}
   if(S.uid)return createRow();
   return sendCode();
- }).catch(function(err){var b2=$('nx');if(b2)b2.disabled=false;var e=$('e');if(e)e.textContent='Xəta oldu: '+((err&&err.message)||'bir az sonra yenidən yoxla')});
+ }).catch(function(err){setBusy(false);var e=$('e');if(e)e.textContent='Xəta oldu: '+((err&&err.message)||'bir az sonra yenidən yoxla')});
 }
 function codeInputs(){return root.querySelectorAll('.codes input')}
 function codeSync(){var c=[].map.call(codeInputs(),function(x){return x.value}).join('');S.code=c;var nx=$('nx');nx.disabled=c.length<6;nx.className='pill'+(c.length===6?' go':'')}
@@ -225,11 +228,11 @@ function resend(){
 function c1(){
  if(S.code.length<6)return;
  if(!SB){S.h=[];S.scr='plan';draw();root.scrollTop=0;return}
- var b=$('nx');b.disabled=true;
+ setBusy(true);
  SB.auth.verifyOtp({email:S.email.toLowerCase(),token:S.code,type:'email'}).then(function(r){
-  if(r.error||!r.data||!r.data.user){var b2=$('nx');if(b2)b2.disabled=false;toast('Kod yanlışdır və ya vaxtı bitib.');return}
+  if(r.error||!r.data||!r.data.user){setBusy(false);toast('Kod yanlışdır və ya vaxtı bitib.');return}
   return afterVerify(r.data.user.id);
- }).catch(function(){var b3=$('nx');if(b3)b3.disabled=false;toast('Xəta oldu. Bir az sonra yenidən cəhd et.')});
+ }).catch(function(){setBusy(false);toast('Xəta oldu. Bir az sonra yenidən cəhd et.')});
 }
 /* Kod təsdiqləndi: əvvəlki qeydiyyat varsa onu aç, yoxdursa e-poçt və adı dərhal yaz. */
 function afterVerify(uid){
@@ -245,7 +248,7 @@ function afterVerify(uid){
 function createRow(){
  return SB.from('preorders').upsert(rowData(),{onConflict:'user_id'}).then(function(w){
   if(w.error){
-   if(w.error.code==='23505'){var b=$('nx');if(b)b.disabled=false;if(S.scr!=='user'){S.h=[];S.scr='user';draw();root.scrollTop=0}var e=$('e');if(e)e.textContent='Bu ad artıq götürülüb. Başqa ad seç.';return}
+   if(w.error.code==='23505'){setBusy(false);if(S.scr!=='user'){S.h=[];S.scr='user';draw();root.scrollTop=0}var e=$('e');if(e)e.textContent='Bu ad artıq götürülüb. Başqa ad seç.';return}
    throw w.error;
   }
   avStore();S.h=[];S.scr='plan';draw();root.scrollTop=0;
@@ -258,7 +261,7 @@ function rowData(){
 }
 function avStore(){try{if(S.uid&&S.av)localStorage.setItem('qs_av_'+S.uid,S.av)}catch(e){}}
 function savePreorder(){
- if(!SB||!S.uid)return Promise.resolve(false);
+ if(!SB||!S.uid||!validUser(S.user))return Promise.resolve(false);
  avStore();
  return SB.from('preorders').upsert(rowData(),{onConflict:'user_id'}).then(function(r){if(r.error)throw r.error;return true}).catch(function(err){toast(err&&err.code==='23505'?'Bu istifadəçi adı artıq götürülüb.':'Məlumat saxlanmadı. İnternetini yoxla və yenidən cəhd et.');return false});
 }
@@ -319,20 +322,20 @@ if(SB){SB.auth.getSession().then(function(r){
   if(new URLSearchParams(location.search).has('error')){
    clearGoogleIntent();openReg();toast('Google ilə giriş alınmadı. Yenidən cəhd et.');
   }
-  return
+  endOAuth();return
  }
- if(root.classList.contains('open'))return;
+ if(root.classList.contains('open')){endOAuth();return}
  return SB.from('preorders').select('*').eq('user_id',ss.user.id).maybeSingle().then(function(q){
   if(q.error)throw q.error;
   if(root.classList.contains('open'))return;
   if(q.data){clearGoogleIntent();if(q.data.theme!=null)location.href='/admin';else openState(restore(q.data));return}
-  var intent=takeGoogleIntent();if(!intent)return;
+  var intent=takeGoogleIntent();if(!intent){endOAuth();return}
   var st=fresh(intent.user);st.uid=ss.user.id;st.email=ss.user.email||'';st.scr='join';st.h=[];
   openState(st);
  });
 }).catch(function(e){
  console.error('İstifadəçi sessiyasını yoxlamaq alınmadı.',e);
- if(!root.classList.contains('open'))openReg();
+ endOAuth();if(!root.classList.contains('open'))openReg();
  toast('Hesab məlumatını yükləmək alınmadı. Yenidən cəhd et.')
 })}
 
@@ -345,4 +348,5 @@ window.startOnboarding=function(e,f){
 };
 document.querySelectorAll('a[href="#signup"]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();openReg()})});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&root.classList.contains('open'))closeReg()});
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.limebtn,nav .pill');if(!b)return;b.classList.add('pressed');setTimeout(function(){b.classList.remove('pressed')},450)});
 })();
